@@ -9,10 +9,21 @@ import (
 )
 
 var (
-	region = kingpin.Flag("region", "The region to use.").Required().String()
-	bucket = kingpin.Flag("bucket", "The bucket to upload into.").Required().String()
-	source = kingpin.Arg("source", "The file to upload.").Required().File()
-	target = kingpin.Arg("target", "The name of the file.").Required().String()
+	acl = kingpin.Flag("acl", "The canned ACL to use").Default("private").Enum(
+		"private",
+		"public-read",
+		"public-read-write",
+		"aws-exec-read",
+		"authenticated-read",
+		"bucket-owner-read",
+		"bucket-owner-full-control",
+		"log-delivery-write",
+	)
+	contentType = kingpin.Flag("content-type", "The content type to assign this object").Default("binary/octet-stream").String()
+	region      = kingpin.Flag("region", "The region to use.").Required().String()
+	bucket      = kingpin.Flag("bucket", "The bucket to upload into.").Required().String()
+	source      = kingpin.Arg("source", "The file to upload.").Required().File()
+	target      = kingpin.Arg("target", "The name of the file.").Required().String()
 )
 
 func main() {
@@ -28,9 +39,14 @@ func main() {
 
 	// Upload the file to S3
 	result, err := uploader.Upload(&s3manager.UploadInput{
-		Bucket: aws.String(*bucket),
-		Key:    aws.String(*target),
-		Body:   *source,
+		Bucket:      aws.String(*bucket),
+		Key:         aws.String(*target),
+		ContentType: contentType,
+		Metadata: map[string]*string{
+			"Content-Type": contentType,
+		},
+		ACL:  acl,
+		Body: *source,
 	})
 
 	// Check for errors

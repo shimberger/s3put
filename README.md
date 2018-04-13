@@ -12,4 +12,9 @@ You can use environment variables to provide secret key & access key:
 
 	AWS_SECRET_KET=abc AWS_ACCESS_KEY=def s3put --bucket=<bucket> --region=<region> <file> <key>
 
+Using stdin
+
+	s3put --bucket=<bucket> --region=<region> -- - <key>
+
+
 Uses multipart upload to allow files bigger than 5GB.

@@ -27,7 +27,7 @@ var (
 	partSize    = kingpin.Flag("part-size", "The part size in MB.").Default("64").Int64()
 	region      = kingpin.Flag("region", "The region to use.").Required().String()
 	bucket      = kingpin.Flag("bucket", "The bucket to upload into.").Required().String()
-	source      = kingpin.Arg("source", "The file to upload.").Required().File()
+	source      = kingpin.Arg("source", "The file to upload.").Required().String()
 	target      = kingpin.Arg("target", "The name of the file.").Required().String()
 )
 
@@ -63,7 +63,7 @@ func main() {
 			"Content-Type": contentType,
 		},
 		ACL:  acl,
-		Body: *source,
+		Body: file,
 	}, func(u *s3manager.Uploader) {
 		u.PartSize = *partSize * 1024 * 1024
 	})

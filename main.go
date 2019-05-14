@@ -20,6 +20,7 @@ var (
 		"log-delivery-write",
 	)
 	contentType = kingpin.Flag("content-type", "The content type to assign this object").Default("binary/octet-stream").String()
+	partSize    = kingpin.Flag("part-size", "The part size in MB.").Default("64").Int64()
 	region      = kingpin.Flag("region", "The region to use.").Required().String()
 	bucket      = kingpin.Flag("bucket", "The bucket to upload into.").Required().String()
 	source      = kingpin.Arg("source", "The file to upload.").Required().File()
@@ -47,6 +48,8 @@ func main() {
 		},
 		ACL:  acl,
 		Body: *source,
+	}, func(u *s3manager.Uploader) {
+		u.PartSize = *partSize * 1024 * 1024
 	})
 
 	// Check for errors
